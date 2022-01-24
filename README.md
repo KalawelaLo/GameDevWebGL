@@ -1,4 +1,4 @@
-# GameDevWebGl
+# GameDevWebGL
 
 ## Getting Started
 
@@ -10,22 +10,22 @@ making machines vunerable.
 There are a lot of ways to host this to your local host.
 ---------------------------------------------
 If you have NodeJS, you can easily host a webserver from any directory.
-'''
+```
     $   npm install http-server -g
-'''
+```
 Then you just navigate to you directory and run it.
-'''
+```
     $   cd /theDirctory
     $   http-server
 
-'''
+```
 When you are done just Ctrl-C
 ------------------------------------------
 If you have python installed, you can run
-'''
+```
     $   cd /theDirctory
     $   python -m http.server 8080
-'''
+```
 -----------------------------------------
 
 ## So Far...
