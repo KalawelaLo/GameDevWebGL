@@ -1,0 +1,4 @@
+#The Holy Git Ignore file.
+
+#mac artifacts
+*.DS_Store

@@ -1,35 +1,69 @@
-export class GameEngine {
-    constructor(gl_context, canvas, body){
-        //I am trying to keep the constructor clean (:
+import { AudioManager } from "./gameAudio.js";
 
+export class GameEngine {
+    constructor(doc, win){
+        console.log("Init Game");
+        //I am trying to keep the constructor clean (:
+        const canvas = doc.getElementById("webGlCanvas");
+        const gl = canvas.getContext("webgl2");
+        const body = doc.querySelector("body");
+        
+        console.log("Init WebGl");
+        //if WebGL context didn't work
+        if (gl == null) {
+            alert("WebGl not Initialized");
+            return null;
+        }
+        
         //This is the main WebGl Context
-        this.gl = gl_context;
+        this.gl = gl;
+        
+        //These are for handling in game-stuffs
+        this.gameDone = false;
+        this.eventQueue = [];
 
         //These are used for IO support
         this.canvas = canvas;
         this.body = body;
 
-        //These are for handling in game-stuffs
-        this.gameDone = false;
-        this.eventQueue = [];
+        //This is used for Audio Support
+        console.log("Init Audio");
+        
+        this.audioManager = new AudioManager(win, doc, this.eventQueue);
+        
+        //this set the COLOR_BUFFER_BIT,
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
+        //clears the screen to the color of COLOR_BUFFER_BIT
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+
+        //Load IO Support
+        console.log("Init IO support");
         this.setupIO();
+
+        //Load Audio assets
+        this.setupAudio();
     }
 
     //IO Support functions
     mousePos(ev) {
         //Get relative in canvas
         //let bounds = ev.srcElement.BoundingClientRect();
-        let X = ev.clientX;
-        let Y = ev.clientY;
+        if (this.audioManager.ctx.state === 'suspended') {
+            this.audioManager.setActive();
+        }
         return {
-            x: X,
-            y: Y
+            x: ev.clientX,
+            y: ev.clientY
     };}
-    //Main setup for other stuffs
+    //Main setup for IO
     setupIO(){
         //keyboard ----> end up on event queue
         this.body.addEventListener("keydown", (ev) => {
+            if (this.audioManager.ctx.state === 'suspended') {
+                this.audioManager.setActive();
+            }
             this.eventQueue.push({
                 evt: "keydown",
                 key: ev.key});
@@ -70,13 +104,28 @@ export class GameEngine {
             });
         }, false);
     }
+    //Audio Setup
+    setupAudio(){
+        console.log("in setup");
+        const track = this.audioManager.getTrack("./assets/audio/test.m4a");
+        this.audioManager.play(track);
+        setTimeout((tr) => this.audioManager.pause(tr) , 2000, track);
+    }
+    //game stuffs
     update(){
 
         //handle input & events
         while (this.eventQueue.length > 0) {
             let e = this.eventQueue.pop();
+            if (e.evt === 'trackblocked') {
+                this.audioManager.trackQueue(e.track);
+            } else if (e.evt === 'trackqueue') {
+                this.audioManager.play(e.track);
+                
+            }
             console.log(e);
         }
+        this.eventQueue;
 
 
         //update objects within game
