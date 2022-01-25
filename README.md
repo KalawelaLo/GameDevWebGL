@@ -14,11 +14,14 @@ If you have NodeJS, you can easily host a webserver from any directory.
     $   npm install http-server -g
 ```
 Then you just navigate to you directory and run it.
+You could even use _nodemon_ to actively reload the page when there are changes.
+
 ```
     $   cd /theDirctory
     $   http-server
 ```
 When you are done just Ctrl-C
+
 ------------------------------------------
 If you have python installed, you can run
 ```
@@ -26,11 +29,18 @@ If you have python installed, you can run
     $   python -m http.server 8080
 ```
 When you are done just Ctrl-C
+
 -----------------------------------------
 
 ## Events
 
+All events have an event name under *evt*.
+
+### Input Events
+These events and definitions can be found in _InputManager_ in **gameInput.js**.
+
 #### Keyboard
+
 There are two types of keyboard events:
 
 - keydown
@@ -50,34 +60,41 @@ All of these mouse events have positions **x** and **y** relative to
 the top left of the WebGL Canvas.
 
 Only other noteable feature is that **mousedown** and **mouseup** also
-have what type of mouse click it was.
+have what type of mouse click it was called **mBtn**
 
 - 1 -> left
 - 2 -> middle
 - 3 -> right
 
-#### Audio
+### Audio
+These events can be located in _AudioManager_ in **gameAudion.js**.
+
 These are the types of audio events so far
 - trackpause
 - trackplay
 - trackblock
 - trackqueue
 
-All tracks events contain a track object under **track** , trackblock
-also has the reason it is blocked.
+All tracks events contain a track object under **track**. The event
+**trackblock** also has the reason it is blocked under **reason**.
 
 ## So Far...
 I currently got IO working for the 2d GameEngine or Game.
-I want to refactor some stuff and move IO into their own dedicated file.
 
 I have decided because we want the system to be non-blocking
 that we will need to make an **eventQueue** feel free to make
 as many events as you like. Currently, we need to figure out
-the rendering process.
+the rendering process. Certain functions with **while** loops 
+will need to be planned in a way that doe not "block" events.
+
 
 I started to work on the audio. I have conceptualized **track**
-objects. You can initialize audio then afterward use it as a
-factory to create tracks. They are still a _work in progress_.
+objects. You can initialize the audio through a manager class **AudioManager**.
+It uses getTrack to setup a track to be used for audio. They are still a big 
+_work in progress_. Lots of testing will need to be done to check 
+tracks playing at the same time (collisions) and things sharing tracks effeciently
+(for performance).
+
 The track object have a few components:
 - elem: a link to the element on the DOM, you can insight play/pause directly on this
 - track: Information about the track, can be used to create complicated sounds

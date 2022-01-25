@@ -64,6 +64,7 @@ export class AudioManager {
 
     //attempts to play the track
     play(trk) {
+        //keeps tracks from blocking
         setTimeout((trk, eq) => {
             if (this.ctx.state === 'running'){
                 trk.elem.play();
@@ -83,6 +84,7 @@ export class AudioManager {
       
     //queues a track to play immediately.
     trackQueue(trk){
+        //keeps tracks from blocking
         setTimeout((trk, eq) => {
             eq.push({
                 evt: "trackqueue",
