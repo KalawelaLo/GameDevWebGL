@@ -1,14 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <style>
+    canvas {
+      display: block;
+      border: 5px solid rgb(156, 88, 88);
+      background-color: black;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <title>WebGL 2D Game</title>
     <script type="module" src="main.js"></script>
-</head>
-<body>
-    <canvas id="webGlCanvas" width="800" height="400"></canvas>
-</body>
+  </head>
+  <body onload="main();">
+    <canvas id="webGlCanvas"></canvas>
+    <script type="vertext_shader" id="vs_Sprite">#version 300 es
+            layout(location=0) in vec2 aPosition;
+            layout(location=1) in vec2 aTexcoord;
+            //layout(location=2) in vec2 aOffset;
+            uniform vec2 aOffset;
+
+            out vec2 vTexCoord;
+            //out vec2 vOffset;
+            void main(){
+              vTexCoord = aTexcoord;
+              //vOffset = aOffset;// IF WE WANT to change frag based on position
+              gl_Position = vec4(aPosition + aOffset , 1, 1);
+            }
+    </script>
+    <script type="fragment_shader" id="fs_Sprite">#version 300 es
+            precision mediump float;
+            uniform sampler2D u_image;
+            in vec2 vTexCoord;
+            //in vec2 vOffset;            
+
+            out vec4 fragColor;
+            void main(){
+              //fragColor = texture(u_image, vTexCoord);
+              fragColor = vec4(1,0,0,1);
+            }
+    </script>
+  </body>
 </html>
