@@ -21,28 +21,28 @@
     <canvas id="webGlCanvas"></canvas>
     <script type="vertext_shader" id="vs_Sprite">#version 300 es
             layout(location=0) in vec2 aPosition;
-            layout(location=1) in vec2 aTexcoord;
+            layout(location=1) in vec2 aTexCoord;
             //layout(location=2) in vec2 aOffset;
             uniform vec2 aOffset;
+            uniform vec2 uScale;
 
             out vec2 vTexCoord;
             //out vec2 vOffset;
             void main(){
-              vTexCoord = aTexcoord;
+              vTexCoord = aTexCoord;
               //vOffset = aOffset;// IF WE WANT to change frag based on position
-              gl_Position = vec4(aPosition + aOffset , 1, 1);
+              gl_Position = vec4(aPosition*uScale + aOffset , 1, 1);
             }
     </script>
     <script type="fragment_shader" id="fs_Sprite">#version 300 es
             precision mediump float;
-            uniform sampler2D u_image;
-            in vec2 vTexCoord;
-            //in vec2 vOffset;            
+            uniform sampler2D uImage;
+            in vec2 vTexCoord;           
 
             out vec4 fragColor;
             void main(){
-              //fragColor = texture(u_image, vTexCoord);
-              fragColor = vec4(1,0,0,1);
+              fragColor = texture(uImage, vTexCoord);
+              //fragColor = vec4(1,0,0,1);
             }
     </script>
   </body>

@@ -62,18 +62,26 @@ export class GameEngine {
 
     //Load Audio assets
     this.setupAudio();
-    this.setupGaphics();
+   
 
     //loading shaders
     let texLoc = "assets/texture/pongStuff.png";
+    let sadCat = "assets/texture/sadCat.jpg";
     let vs = document.getElementById("vs_Sprite").innerHTML;
     let fs = document.getElementById("fs_Sprite").innerHTML;
     //load sprites maybe array so we can add and remove on cammand
 
     //we will just send the image directly load here maybe
+    
+//creating sprites
     this.leftPaddle = new Sprite(this.gl, texLoc, vs, fs);
     this.rightPaddle = new Sprite(this.gl, texLoc, vs, fs);
-    this.rightPaddle.setPos(1,-1);
+    this.leftScore = new Sprite(this.gl, texLoc, vs, fs);
+    this.rightScore = new Sprite(this.gl, texLoc, vs, fs);
+    this.background = new Sprite(this.gl, sadCat, vs, fs);
+    
+    //setup position, size and other things 
+    this.setupGaphics();
   }
 
   //Audio Setup
@@ -92,6 +100,36 @@ export class GameEngine {
   }
   setupGaphics() {
     //load assets for the game graphics.
+    //TERRIBLE SOLUTION ASK KALA D: // just modify to use 1px by 1px image till image loads..but we need width info
+    // set sprite locations and sizes
+    const delay = ms => new Promise(res => setTimeout(res, ms));
+    const TempFix = async () => {
+      await delay(500);
+      console.log("Waited 5s");
+
+      this.rightPaddle.setPos(1,-1);
+
+      this.leftPaddle.setTileSize(32);
+      this.leftPaddle.tileToRender(0);
+      this.rightPaddle.setTileSize(32);
+      this.rightPaddle.tileToRender(1);
+
+      this.leftScore.setTileSize(32);
+      this.leftScore.tileToRender(2);
+      this.leftScore.setPos(0,0.8);
+      this.leftScore.setScale(0.2,0.2);
+
+      this.rightScore.setTileSize(32);
+      this.rightScore.tileToRender(3);
+      this.rightScore.setPos(0.2,0.8);
+      this.rightScore.setScale(0.2,0.2);
+
+      this.background.setScale(2,2);
+      this.background.setPos(1,-1);
+    };
+    TempFix();
+    //enables blend(transparency)
+    this.gl.enable(this.gl.BLEND);
   }
 
   //game stuffs
@@ -108,6 +146,8 @@ export class GameEngine {
     }
     //update objects within game
 
+    //move paddles //Temp since they are framerate based >:(
+    //We need a clock. Use time delta between frames
     this.leftPaddle.move(0.0000,-0.0001);
     this.rightPaddle.move(0.0000,0.0001);
 
@@ -116,10 +156,16 @@ export class GameEngine {
   draw() {
     //clears the screen to the color of COLOR_BUFFER_BIT
     this.gl.clear(this.gl.COLOR_BUFFER_BIT); //BufferBit is black rn.
-
-    //draw updated objects.
+    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+    
+    //draw updated objects. Order Matters
+    this.background.draw();
+    this.leftScore.draw();
+    this.rightScore.draw();
     this.leftPaddle.draw();
     this.rightPaddle.draw();
+    this.background
+
     //I belive these happen here        and these happen somewhere else
 
     //vertex specification
@@ -140,4 +186,5 @@ export class GameEngine {
 
     //per sample operations
   }
+
 }
