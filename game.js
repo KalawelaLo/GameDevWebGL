@@ -1,6 +1,7 @@
 import { AudioManager } from "./gameAudio.js";
-import { InputManager } from "./gameInput.js";
+//import { InputManager } from "./gameInput.js";
 import { Sprite } from "./sprite.js";
+import { KeyInput } from "./keyinput.js";
 
 export class GameEngine {
   constructor(doc, win) {
@@ -25,10 +26,6 @@ export class GameEngine {
     canvas.height = (canvas.width * 9) / 16;
     const gl = canvas.getContext("webgl2");
 
-
-
-
-
     console.log("Init WebGl");
     //if WebGL context didn't work
     if (gl == null) {
@@ -49,7 +46,9 @@ export class GameEngine {
     this.audioManager = new AudioManager(win, doc, this.eventQueue);
 
     //TODO: i broke the input manager :(
-    this.inputManage = new InputManager(doc, this.eventQueue, this.audioManager);
+    //this.inputManage = new InputManager(doc, this.eventQueue, this.audioManager);
+    //stores what keys are pressed in an array
+    this.keyInput = new KeyInput();
 
     //this set the COLOR_BUFFER_BIT,
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -60,10 +59,12 @@ export class GameEngine {
     //Load IO Support
     console.log("Init IO support");
 
+  
+
+
     //Load Audio assets
     this.setupAudio();
-   
-
+ 
     //loading shaders
     let texLoc = "assets/texture/pongStuff.png";
     let sadCat = "assets/texture/sadCat.jpg";
@@ -72,15 +73,15 @@ export class GameEngine {
     //load sprites maybe array so we can add and remove on cammand
 
     //we will just send the image directly load here maybe
-    
-//creating sprites
+
+    //creating sprites
     this.leftPaddle = new Sprite(this.gl, texLoc, vs, fs);
     this.rightPaddle = new Sprite(this.gl, texLoc, vs, fs);
     this.leftScore = new Sprite(this.gl, texLoc, vs, fs);
     this.rightScore = new Sprite(this.gl, texLoc, vs, fs);
     this.background = new Sprite(this.gl, sadCat, vs, fs);
-    
-    //setup position, size and other things 
+
+    //setup position, size and other things
     this.setupGaphics();
   }
 
@@ -102,12 +103,12 @@ export class GameEngine {
     //load assets for the game graphics.
     //TERRIBLE SOLUTION ASK KALA D: // just modify to use 1px by 1px image till image loads..but we need width info
     // set sprite locations and sizes
-    const delay = ms => new Promise(res => setTimeout(res, ms));
+    const delay = (ms) => new Promise((res) => setTimeout(res, ms));
     const TempFix = async () => {
       await delay(500);
       console.log("Waited 5s");
 
-      this.rightPaddle.setPos(1,-1);
+      this.rightPaddle.setPos(1, -1);
 
       this.leftPaddle.setTileSize(32);
       this.leftPaddle.tileToRender(0);
@@ -116,16 +117,16 @@ export class GameEngine {
 
       this.leftScore.setTileSize(32);
       this.leftScore.tileToRender(2);
-      this.leftScore.setPos(0,0.8);
-      this.leftScore.setScale(0.2,0.2);
+      this.leftScore.setPos(0, 0.8);
+      this.leftScore.setScale(0.2, 0.2);
 
       this.rightScore.setTileSize(32);
       this.rightScore.tileToRender(3);
-      this.rightScore.setPos(0.2,0.8);
-      this.rightScore.setScale(0.2,0.2);
+      this.rightScore.setPos(0.2, 0.8);
+      this.rightScore.setScale(0.2, 0.2);
 
-      this.background.setScale(2,2);
-      this.background.setPos(1,-1);
+      this.background.setScale(2, 2);
+      this.background.setPos(1, -1);
     };
     TempFix();
     //enables blend(transparency)
@@ -148,23 +149,38 @@ export class GameEngine {
 
     //move paddles //Temp since they are framerate based >:(
     //We need a clock. Use time delta between frames
-    this.leftPaddle.move(0.0000,-0.0001);
-    this.rightPaddle.move(0.0000,0.0001);
+    this.leftPaddle.move(0.0, -0.0001);
+    this.rightPaddle.move(0.0, 0.0001);
 
+    //input handling
+    //is this how we should handle input?
+    if(this.keyInput.keyPressed('d')){
+      this.leftPaddle.move(0.01, 0.0);
+    }
+    if(this.keyInput.keyPressed('a')){
+      this.leftPaddle.move(-0.01, 0.0);
+    }
+    if(this.keyInput.keyPressed('w')){
+      this.leftPaddle.move(0.0, 0.01);
+    }
+    if(this.keyInput.keyPressed('s')){
+      this.leftPaddle.move(0.0, -0.01);
+    }
   }
+
 
   draw() {
     //clears the screen to the color of COLOR_BUFFER_BIT
     this.gl.clear(this.gl.COLOR_BUFFER_BIT); //BufferBit is black rn.
     this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
-    
+
     //draw updated objects. Order Matters
     this.background.draw();
     this.leftScore.draw();
     this.rightScore.draw();
     this.leftPaddle.draw();
     this.rightPaddle.draw();
-    this.background
+    this.background;
 
     //I belive these happen here        and these happen somewhere else
 
@@ -186,5 +202,4 @@ export class GameEngine {
 
     //per sample operations
   }
-
 }
